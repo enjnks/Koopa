@@ -67,14 +67,14 @@ parser.add_argument('--alpha', type=float, default=0.2, help='spectrum filter ra
 parser.add_argument('--multistep', action='store_true', help='whether to use approximation for multistep K', default=False)
 
 
-args = parser.parse_args()
+args = parser.parse_args() #解析参数
 
 args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
 
 fix_seed = args.seed
-random.seed(fix_seed)
-torch.manual_seed(fix_seed)
-np.random.seed(fix_seed)
+random.seed(fix_seed) #设置Python标准库random模块的随机种子
+torch.manual_seed(fix_seed) #设置PyTorch的全局随机种子
+np.random.seed(fix_seed) #设置NumPy的随机种子
 
 if args.use_gpu:
     if args.use_multi_gpu:

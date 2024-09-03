@@ -22,6 +22,7 @@ class Exp_Main(Exp_Basic):
     def __init__(self, args):
         super(Exp_Main, self).__init__(args)
 
+    #计算并返回频谱掩码，用于识别时间序列中的时不变成分
     def _get_mask_spectrum(self):
         """
         get shared frequency spectrums
@@ -35,6 +36,7 @@ class Exp_Main(Exp_Basic):
         mask_spectrum = amps.topk(int(amps.shape[0]*self.args.alpha)).indices
         return mask_spectrum # as the spectrums of time-invariant component
 
+    #构建模型
     def _build_model(self):
         model_dict = {
             'Koopa': Koopa,
@@ -46,18 +48,22 @@ class Exp_Main(Exp_Basic):
             model = nn.DataParallel(model, device_ids=self.args.device_ids)
         return model
 
+    #获取数据
     def _get_data(self, flag):
         data_set, data_loader = data_provider(self.args, flag)
         return data_set, data_loader
 
+    #选择优化器
     def _select_optimizer(self):
         model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         return model_optim
 
+    #选择损失函数
     def _select_criterion(self):
         criterion = nn.MSELoss()
         return criterion
 
+    #验证
     def vali(self, vali_data, vali_loader, criterion):
         total_loss = []
         self.model.eval()
@@ -92,6 +98,7 @@ class Exp_Main(Exp_Basic):
         self.model.train()
         return total_loss
 
+    #训练
     def train(self, setting):
         train_data, train_loader = self._get_data(flag='train')
         vali_data, vali_loader = self._get_data(flag='val')
@@ -118,11 +125,10 @@ class Exp_Main(Exp_Basic):
 
             self.model.train()
             epoch_time = time.time()
-            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader): #将数据解包，batch_x 输入数据 batch_y 标签数据
                 iter_count += 1
                 model_optim.zero_grad()
                 batch_x = batch_x.float().to(self.device)
-
                 batch_y = batch_y.float().to(self.device)
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
@@ -133,7 +139,7 @@ class Exp_Main(Exp_Basic):
 
                 # encoder - decoder
                 if self.args.use_amp:
-                    with torch.cuda.amp.autocast():
+                    with torch.cuda.amp.autocast(): #自动混合精度（Automatic Mixed Precision, AMP）训练的一个上下文管理器
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
                         f_dim = -1 if self.args.features == 'MS' else 0
@@ -185,6 +191,7 @@ class Exp_Main(Exp_Basic):
 
         return self.model
 
+    #测试
     def test(self, setting, test=0):
         test_data, test_loader = self._get_data(flag='test')
         if test:
@@ -260,6 +267,7 @@ class Exp_Main(Exp_Basic):
 
         return
 
+    #预测
     def predict(self, setting, load=False):
         pred_data, pred_loader = self._get_data(flag='pred')
 

@@ -238,7 +238,7 @@ class Model(nn.Module):
     Koopman Forecasting Model
     '''
     def __init__(self, configs):
-        super(Model, self).__init__()
+        super(Model, self).__init__() #继承父类的初始化方法
         self.mask_spectrum = configs.mask_spectrum
         self.enc_in = configs.enc_in
         self.input_len = configs.seq_len
@@ -250,20 +250,20 @@ class Model(nn.Module):
         self.hidden_layers = configs.hidden_layers
         self.multistep = configs.multistep
 
-        self.disentanglement = FourierFilter(self.mask_spectrum)
+        self.disentanglement = FourierFilter(self.mask_spectrum) #解耦时变和时不变
 
-        # shared encoder/decoder to make koopman embedding consistent
+        # shared encoder/decoder to make koopman embedding consistent 共享编码器/解码器以保持库普曼嵌入的一致性
         self.time_inv_encoder = MLP(f_in=self.input_len, f_out=self.dynamic_dim, activation='relu',
                     hidden_dim=self.hidden_dim, hidden_layers=self.hidden_layers)
         self.time_inv_decoder = MLP(f_in=self.dynamic_dim, f_out=self.pred_len, activation='relu',
                            hidden_dim=self.hidden_dim, hidden_layers=self.hidden_layers)
-        self.time_inv_kps = self.time_var_kps = nn.ModuleList([
+        self.time_inv_kps = self.time_var_kps = nn.ModuleList([ #？？？
                                 TimeInvKP(input_len=self.input_len,
                                     pred_len=self.pred_len, 
                                     dynamic_dim=self.dynamic_dim,
                                     encoder=self.time_inv_encoder, 
                                     decoder=self.time_inv_decoder)
-                                for _ in range(self.num_blocks)])
+                                for _ in range(self.num_blocks)]) #占位符，表示循环变量在循环体内不会被使用
 
         # shared encoder/decoder to make koopman embedding consistent
         self.time_var_encoder = MLP(f_in=self.seg_len*self.enc_in, f_out=self.dynamic_dim, activation='tanh',
@@ -284,7 +284,7 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # x_enc: B L C
 
-        # Series Stationarization adopted from NSformer
+        # Series Stationarization adopted from NSformer 从NSformer中采用的序列平稳化处理
         mean_enc = x_enc.mean(1, keepdim=True).detach() # B x 1 x E
         x_enc = x_enc - mean_enc
         std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
