@@ -1,6 +1,6 @@
-python -u run.py \
+python -u /home/featurize/Koopa/run.py \
   --is_training 1 \
-  --root_path ./dataset/electricity/ \
+  --root_path /home/featurize/data/dataset/electricity \
   --data_path electricity.csv \
   --model_id ECL_96_48 \
   --model Koopa \
@@ -21,9 +21,9 @@ python -u run.py \
   --itr 1 \
   --gpu 0
 
-python -u run.py \
+python -u /home/featurize/Koopa/run.py \
   --is_training 1 \
-  --root_path ./dataset/electricity/ \
+  --root_path /home/featurize/data/dataset/electricity \
   --data_path electricity.csv \
   --model_id ECL_192_96 \
   --model Koopa \
@@ -44,9 +44,9 @@ python -u run.py \
   --itr 1 \
   --gpu 0
 
-python -u run.py \
+python -u /home/featurize/Koopa/run.py \
   --is_training 1 \
-  --root_path ./dataset/electricity/ \
+  --root_path /home/featurize/data/dataset/electricity \
   --data_path electricity.csv \
   --model_id ECL_288_144 \
   --model Koopa \
@@ -67,9 +67,9 @@ python -u run.py \
   --itr 1 \
   --gpu 0
 
-python -u run.py \
+python -u /home/featurize/Koopa/run.py \
   --is_training 1 \
-  --root_path ./dataset/electricity/ \
+  --root_path /home/featurize/data/dataset/electricity \
   --data_path electricity.csv \
   --model_id ECL_384_192 \
   --model Koopa \
