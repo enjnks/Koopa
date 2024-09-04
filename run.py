@@ -8,20 +8,20 @@ import numpy as np
 parser = argparse.ArgumentParser(description='Koopa for Time Series Forecasting')
 
 # basic config
-parser.add_argument('--is_training', type=int, required=True, default=1, help='status')
+parser.add_argument('--is_training', type=int, required=True, default=1, help='status') #启动训练
 parser.add_argument('--model_id', type=str, required=True, default='test', help='model id')
 parser.add_argument('--model', type=str, required=True, default='Koopa',
                     help='model name, options: [Koopa]')
 
 # data loader
-parser.add_argument('--data', type=str, required=True, default='ETTh2', help='dataset type')
+parser.add_argument('--data', type=str, required=True, default='ETTh2', help='dataset type') #数据集类型
 parser.add_argument('--root_path', type=str, default='./data/ETT/', help='root path of the data file')
 parser.add_argument('--data_path', type=str, default='ETTh2.csv', help='data file')
 parser.add_argument('--features', type=str, default='M',
                     help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
 parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
 parser.add_argument('--freq', type=str, default='h',
-                    help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
+                    help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h') #时间特征编码的频率选项：[s:每秒, t:每分钟, h:每小时, d:每天, b:工作日, w:每周, m:每月]，还可以使用更详细的频率，如15分钟或3小时。
 parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
 
 # forecasting task
@@ -40,9 +40,9 @@ parser.add_argument('--do_predict', action='store_true', help='whether to predic
 
 # optimization
 parser.add_argument('--num_workers', type=int, default=10, help='data loader num workers')
-parser.add_argument('--itr', type=int, default=1, help='experiments times')
+parser.add_argument('--itr', type=int, default=1, help='experiments times') #实验运行次数 1
 parser.add_argument('--train_epochs', type=int, default=10, help='train epochs')
-parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
+parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data') #批大小，dataloader
 parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='optimizer learning rate')
 parser.add_argument('--des', type=str, default='test', help='exp description')
@@ -88,7 +88,7 @@ if args.use_gpu:
 print('Args in experiment:')
 print(args)
 
-Exp = Exp_Main
+Exp = Exp_Main #实例化Exp_Main类
 
 if args.is_training:
     for ii in range(args.itr):
@@ -108,7 +108,7 @@ if args.is_training:
             args.alpha,
             args.des, ii)
 
-        exp = Exp(args)  # set experiments
+        exp = Exp(args)  # set experiments 初始化对象，将参数容器传入
         print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
         exp.train(setting)
 
@@ -119,7 +119,7 @@ if args.is_training:
             print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
             exp.predict(setting, True)
 
-        torch.cuda.empty_cache()
+        torch.cuda.empty_cache() #清理CUDA缓存
 else:
     ii = 0
     setting = '{}_{}_{}_ft{}_sl{}_pl{}_segl{}_dyna{}_h{}_l{}_nb{}_a{}_{}_{}'.format(

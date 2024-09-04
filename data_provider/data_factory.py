@@ -11,14 +11,15 @@ data_dict = {
 
 
 def data_provider(args, flag):
-    Data = data_dict[args.data]
+    Data = data_dict[args.data] #字典 不同的数据集类型，对应不同的dataset类
     timeenc = 0 if args.embed != 'timeF' else 1
 
+    #按照不同的数据集，设置不同的dataloader参数
     if flag == 'test':
-        shuffle_flag = False
-        drop_last = False 
-        batch_size = 1
-        freq = args.freq 
+        shuffle_flag = False #乱序
+        drop_last = False #	是否丢弃最后一个样本数量不足batch_size批次数据
+        batch_size = 1 #批大小
+        freq = args.freq #
     elif flag == 'pred':
         shuffle_flag = False
         drop_last = False
@@ -26,11 +27,14 @@ def data_provider(args, flag):
         freq = args.freq
         Data = Dataset_Pred
     else:
+        # flag == 'train'，flag == 'val'
         shuffle_flag = True
         drop_last = True
         batch_size = args.batch_size
         freq = args.freq
 
+# Dataset	一个数据集抽象类，所有自定义的Dataset都需要继承它，并且重写__getitem__()或__get_sample__()这个类方法
+# DataLoader	一个可迭代的数据装载器。在训练的时候，每一个for循环迭代，就从DataLoader中获取一个batch_sieze大小的数据。
     data_set = Data(
         root_path=args.root_path,
         data_path=args.data_path,
@@ -42,10 +46,12 @@ def data_provider(args, flag):
         freq=freq
     )
     print(flag, len(data_set))
+    
     data_loader = DataLoader(
         data_set,
         batch_size=batch_size,
         shuffle=shuffle_flag,
-        num_workers=args.num_workers,
-        drop_last=drop_last)
+        num_workers=args.num_workers, #使用多进程读取数据，设置的进程数
+        drop_last=drop_last
+    )
     return data_set, data_loader
