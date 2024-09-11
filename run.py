@@ -18,7 +18,7 @@ parser.add_argument('--data', type=str, required=True, default='ETTh2', help='da
 parser.add_argument('--root_path', type=str, default='./data/ETT/', help='root path of the data file')
 parser.add_argument('--data_path', type=str, default='ETTh2.csv', help='data file')
 parser.add_argument('--features', type=str, default='M',
-                    help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate')
+                    help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, S:univariate predict univariate, MS:multivariate predict univariate M：多变量预测多变量，S：单变量预测单变量，MS：多变量预测单变量')
 parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
 parser.add_argument('--freq', type=str, default='h',
                     help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h') #时间特征编码的频率选项：[s:每秒, t:每分钟, h:每小时, d:每天, b:工作日, w:每周, m:每月]，还可以使用更详细的频率，如15分钟或3小时。
@@ -88,11 +88,12 @@ if args.use_gpu:
 print('Args in experiment:')
 print(args)
 
-Exp = Exp_Main #实例化Exp_Main类
+Exp = Exp_Main #将 Exp_Main 类赋值给 Exp 这个变量，而非初始化对象
 
-if args.is_training:
-    for ii in range(args.itr):
-        # setting record of experiments
+if args.is_training: 
+    #启动实验
+    for ii in range(args.itr): #实验运行次数 1次
+        #实验参数设置
         setting = '{}_{}_{}_ft{}_sl{}_pl{}_segl{}_dyna{}_h{}_l{}_nb{}_a{}_{}_{}'.format(
             args.model_id,
             args.model,
@@ -108,19 +109,20 @@ if args.is_training:
             args.alpha,
             args.des, ii)
 
-        exp = Exp(args)  # set experiments 初始化对象，将参数容器传入
-        print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
-        exp.train(setting)
+        exp = Exp(args)  # Exp 引用 Exp_Main，初始化对象，将参数容器arg传入
+        print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting)) #输出参数设置
+        exp.train(setting) #训练
 
         print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-        exp.test(setting)
+        exp.test(setting) #测试
 
         if args.do_predict:
             print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-            exp.predict(setting, True)
+            exp.predict(setting, True) #验证，默认不开启
 
         torch.cuda.empty_cache() #清理CUDA缓存
 else:
+    #关闭实验
     ii = 0
     setting = '{}_{}_{}_ft{}_sl{}_pl{}_segl{}_dyna{}_h{}_l{}_nb{}_a{}_{}_{}'.format(
         args.model_id,
