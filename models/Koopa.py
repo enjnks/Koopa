@@ -358,7 +358,7 @@ class Model(nn.Module):
                 forecast += (time_inv_output + time_var_output)
 
         # Series Stationarization adopted from NSformer
-        res = forecast * std_enc + mean_enc
+        res = forecast * std_enc + mean_enc #用于对时间序列数据进行平稳化处理的逆操作，即将经过模型预测的数据转换回其原始的尺度。
 
         return res
     
