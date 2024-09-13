@@ -110,7 +110,7 @@ class Exp_Main(Exp_Basic):
         vali_data, vali_loader = self._get_data(flag='val')
         test_data, test_loader = self._get_data(flag='test')
 
-        #加载cheakpoint路径， default './checkpoints/'
+        #加载cheakpoint路径， default '/home/featurize/work/checkpoints/'
         path = os.path.join(self.args.checkpoints, setting)
         if not os.path.exists(path):
             os.makedirs(path)
@@ -249,14 +249,14 @@ class Exp_Main(Exp_Basic):
         # 使用 torch.load 加载保存在检查点路径的模型状态字典，并使用 load_state_dict 方法将其应用到模型。
         if test:
             print('loading model')
-            self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
+            self.model.load_state_dict(torch.load(os.path.join('/home/featurize/work/checkpoints/' + setting, 'checkpoint.pth')))
 
         #初始化两个空列表 preds 和 trues，用于存储预测结果和真实值。
         # 构建存储测试结果的文件夹路径。
         # 如果文件夹不存在，则创建它。
         preds = []
         trues = []
-        folder_path = './test_results/' + setting + '/'
+        folder_path = '/home/featurize/work/test_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
@@ -330,7 +330,7 @@ class Exp_Main(Exp_Basic):
         # result save
         #构建存储测试指标的文件夹路径。
         # 如果文件夹不存在，则创建它。
-        folder_path = './results/' + setting + '/'
+        folder_path = '/home/featurize/work/results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
@@ -339,7 +339,7 @@ class Exp_Main(Exp_Basic):
         #打开（或创建）一个名为 result.txt 的文件，以追加模式。
         # 将设置和 MSE、MAE 写入文件。
         # 关闭文件。
-        f = open("result.txt", 'a')
+        f = open("/home/featurize/work/result.txt", 'a')
         f.write(setting + "  \n")
         f.write('mse:{}, mae:{}'.format(mse, mae))
         f.write('\n')
