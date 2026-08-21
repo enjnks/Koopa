@@ -84,13 +84,55 @@ def normalize_line_colors(image: Image.Image) -> dict[str, int]:
             red, green, blue, alpha = pixels[x, y]
             if alpha == 0:
                 continue
-            if blue > red * 1.25 and blue > green * 1.25:
+            in_legend = (
+                image.width * 0.19 <= x <= image.width * 0.45
+                and image.height * 0.05 <= y <= image.height * 0.30
+            )
+            in_plot = (
+                image.width * 0.21 <= x <= image.width * 0.945
+                and image.height * 0.04 <= y <= image.height * 0.775
+                and not in_legend
+            )
+            in_blue_legend = (
+                image.width * 0.20 <= x <= image.width * 0.30
+                and image.height * 0.08 <= y <= image.height * 0.115
+            )
+            in_orange_legend = (
+                image.width * 0.20 <= x <= image.width * 0.30
+                and image.height * 0.145 <= y <= image.height * 0.185
+            )
+            in_green_legend = (
+                image.width * 0.20 <= x <= image.width * 0.30
+                and image.height * 0.215 <= y <= image.height * 0.255
+            )
+            in_green_marker = (
+                image.width * 0.735 <= x <= image.width * 0.765
+                and image.height * 0.03 <= y <= image.height * 0.785
+            )
+            in_orange_marker = (
+                image.width * 0.76 <= x <= image.width * 0.79
+                and image.height * 0.03 <= y <= image.height * 0.785
+            )
+
+            if (
+                (in_plot or in_blue_legend)
+                and blue > red * 1.25
+                and blue > green * 1.25
+            ):
                 pixels[x, y] = (0, 0, 255, alpha)
                 changed["blue"] += 1
-            elif green > red * 1.25 and green > blue * 1.25:
+            elif (
+                (in_green_marker or in_green_legend)
+                and green > red * 1.25
+                and green > blue * 1.25
+            ):
                 pixels[x, y] = (0, 128, 0, alpha)
                 changed["green"] += 1
-            elif red > green * 1.1 and green > blue * 1.8:
+            elif (
+                (in_orange_marker or in_orange_legend)
+                and red > green * 1.1
+                and green > blue * 1.8
+            ):
                 pixels[x, y] = (255, 165, 0, alpha)
                 changed["orange"] += 1
     return changed
