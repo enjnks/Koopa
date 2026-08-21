@@ -71,7 +71,8 @@ bash ./scripts/ETT_script/Koopa.sh
 
 ## Threshold visualization
 
-`figures/stsa_threshold_1192.svg` shows the corrected threshold positions:
+`figures/stsa_threshold_1192.png` is the corrected image. Its editable vector
+source is available at `figures/stsa_threshold_1192.svg`.
 
 - STSA: 1140 (green dashed line)
 - μ+3σ: 1192 (orange dashed line)
