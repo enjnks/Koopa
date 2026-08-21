@@ -102,7 +102,7 @@ def render_chart(
 
     # Match the approximately 410×296 reference layout.
     # Leave extra room for the five-digit "12000" tick label.
-    figure.subplots_adjust(left=0.172, right=0.955, bottom=0.205, top=0.975)
+    figure.subplots_adjust(left=0.172, right=0.945, bottom=0.205, top=0.975)
 
     png_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(
@@ -117,6 +117,14 @@ def render_chart(
         transparent=False,
     )
     plt.close(figure)
+
+    # Matplotlib path output may contain line-ending spaces; normalize them so
+    # repository whitespace checks remain clean.
+    svg_text = svg_path.read_text(encoding="utf-8")
+    svg_path.write_text(
+        "\n".join(line.rstrip() for line in svg_text.splitlines()) + "\n",
+        encoding="utf-8",
+    )
 
 
 def parse_args() -> argparse.Namespace:
