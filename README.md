@@ -119,7 +119,9 @@ available at `figures/image3_without_mu3sigma.svg`.
 
 The reusable pixel-preserving utility is `utils/remove_mu3sigma.py`. It also
 compacts the legend to two rows and restores the axis pixels previously covered
-by the removed marker.
+by the removed marker. Because the μ+3σ marker overlapped the Feature signal,
+the hidden blue segment is reconnected from the neighboring trajectory so the
+result remains continuous after marker removal.
 
 
 ## Citation

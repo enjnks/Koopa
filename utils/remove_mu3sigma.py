@@ -6,7 +6,7 @@ import argparse
 import base64
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 def is_orange(pixel: tuple[int, int, int, int]) -> bool:
@@ -81,6 +81,36 @@ def remove_vertical_marker(
     return left, min(rows), right, max(rows)
 
 
+def restore_feature_path(
+    image: Image.Image,
+    points: list[tuple[int, int]],
+    *,
+    clip_x: tuple[int, int],
+) -> None:
+    """Reconnect the blue feature segment hidden beneath the removed marker."""
+    scale = 4
+    overlay = Image.new(
+        "RGBA",
+        (image.width * scale, image.height * scale),
+        (0, 0, 0, 0),
+    )
+    draw = ImageDraw.Draw(overlay)
+    draw.line(
+        [(x * scale, y * scale) for x, y in points],
+        fill=(0, 0, 255, 255),
+        width=6,
+        joint="curve",
+    )
+    overlay = overlay.resize(image.size, Image.Resampling.LANCZOS)
+
+    # Restrict new pixels to the old marker strip. All source pixels outside
+    # this strip remain byte-for-byte unchanged.
+    clipped = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    left, right = clip_x
+    clipped.paste(overlay.crop((left, 0, right + 1, image.height)), (left, 0))
+    image.alpha_composite(clipped)
+
+
 def compact_legend(
     image: Image.Image,
     *,
@@ -142,6 +172,11 @@ def main() -> None:
     args = parse_args()
     image = Image.open(args.source).convert("RGBA")
     marker_bounds = remove_vertical_marker(image, center_x=args.marker_x)
+    restore_feature_path(
+        image,
+        [(376, 106), (377, 96), (378, 86), (379, 76), (380, 66)],
+        clip_x=(marker_bounds[0], marker_bounds[2]),
+    )
     legend_bounds = compact_legend(
         image,
         bounds=(82, 18, 193, 95),
