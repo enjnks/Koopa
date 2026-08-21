@@ -71,6 +71,31 @@ def unpremultiply_region(
                 pixels[x, y] = (*corrected, alpha)
 
 
+def normalize_line_colors(image: Image.Image) -> dict[str, int]:
+    """Set chart-line RGB channels to their original Matplotlib colors.
+
+    Alpha values and pixel coordinates are left untouched, so antialiasing,
+    line thickness, dash patterns, and marker positions remain unchanged.
+    """
+    pixels = image.load()
+    changed = {"blue": 0, "orange": 0, "green": 0}
+    for y in range(image.height):
+        for x in range(image.width):
+            red, green, blue, alpha = pixels[x, y]
+            if alpha == 0:
+                continue
+            if blue > red * 1.25 and blue > green * 1.25:
+                pixels[x, y] = (0, 0, 255, alpha)
+                changed["blue"] += 1
+            elif green > red * 1.25 and green > blue * 1.25:
+                pixels[x, y] = (0, 128, 0, alpha)
+                changed["green"] += 1
+            elif red > green * 1.1 and green > blue * 1.8:
+                pixels[x, y] = (255, 165, 0, alpha)
+                changed["orange"] += 1
+    return changed
+
+
 def move_marker(
     source_path: Path,
     png_path: Path,
@@ -80,6 +105,7 @@ def move_marker(
     new_center_x: int,
     restore_blue_path: list[tuple[int, int]] | None = None,
     normalize_legend_bounds: tuple[int, int, int, int] | None = None,
+    normalize_colors: bool = False,
 ) -> tuple[tuple[int, int, int, int], tuple[int, int, int, int]]:
     """Move the orange vertical marker and return old/new changed bounds."""
     source = Image.open(source_path).convert("RGBA")
@@ -171,6 +197,8 @@ def move_marker(
 
     if normalize_legend_bounds:
         unpremultiply_region(result, normalize_legend_bounds)
+    if normalize_colors:
+        normalize_line_colors(result)
 
     png_path.parent.mkdir(parents=True, exist_ok=True)
     result.save(png_path, format="PNG", optimize=False)
@@ -213,6 +241,11 @@ def parse_args() -> argparse.Namespace:
         "--normalize-legend",
         help='Legend bounds as "left,top,right,bottom"',
     )
+    parser.add_argument(
+        "--normalize-colors",
+        action="store_true",
+        help="Use blue #0000FF, orange #FFA500, and green #008000",
+    )
     return parser.parse_args()
 
 
@@ -236,6 +269,7 @@ def main() -> None:
         new_center_x=args.new_x,
         restore_blue_path=restore_blue_path,
         normalize_legend_bounds=normalize_legend_bounds,
+        normalize_colors=args.normalize_colors,
     )
     print(f"old marker bounds: {old_bounds}")
     print(f"new marker bounds: {new_bounds}")

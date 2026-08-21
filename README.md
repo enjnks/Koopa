@@ -94,6 +94,16 @@ The legend region is converted from incorrectly premultiplied RGBA values to
 standard straight-alpha PNG values. This keeps its background white when the
 image is inserted into Word instead of appearing gray.
 
+To avoid muted colors in Word, chart lines use the same standard RGB values as
+the original plot:
+
+- Feature blue: `RGB(0, 0, 255)` / `#0000FF`
+- μ+3σ orange: `RGB(255, 165, 0)` / `#FFA500`
+- STSA green: `RGB(0, 128, 0)` / `#008000`
+
+Only RGB channels are normalized; alpha values and pixel coordinates are not
+changed, so line positions, widths, antialiasing, and dash patterns stay fixed.
+
 
 ## Citation
 
