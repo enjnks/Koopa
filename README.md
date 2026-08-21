@@ -123,6 +123,22 @@ by the removed marker. Because the μ+3σ marker overlapped the Feature signal,
 the hidden blue segment is reconnected from the neighboring trajectory so the
 result remains continuous after marker removal.
 
+## Matched waveform figure style
+
+`figures/wechat_waveform_matched_style.png` reformats the 0–12000 minute
+waveform to match the two reference figures:
+
+- 410 × 296 pixel canvas;
+- Tinos, a metric-compatible Times New Roman substitute;
+- 16 pt axis labels and 14 pt tick labels;
+- waveform color `#1F77B4`;
+- white background and 1 px black axes.
+
+The original waveform pixels are extracted from the source plot and recolored,
+while axes and text are rendered again at the target resolution. The SVG output
+is `figures/wechat_waveform_matched_style.svg`, and the reusable renderer is
+`utils/restyle_waveform.py`.
+
 
 ## Citation
 
