@@ -69,6 +69,17 @@ bash ./scripts/ETT_script/Koopa.sh
 <img src="./figures/algorithm.png" height = "480" alt="" align=center />
 </p>
 
+## Threshold visualization
+
+`figures/stsa_threshold_1192.svg` shows the corrected threshold positions:
+
+- STSA: 1140 (green dashed line)
+- μ+3σ: 1192 (orange dashed line)
+
+The μ+3σ position is calculated with the same linear horizontal scale as the
+STSA marker. For future updates, generating the plot directly from the original
+data is preferable to editing image pixels, because it avoids rounding errors.
+
 
 ## Citation
 

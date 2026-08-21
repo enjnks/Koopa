@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="437" height="344" viewBox="0 0 437 344">
+  <!-- Recreated at 437x344; STSA=1140 maps to x=341 and 1192 maps to x=352. -->
+  <rect width="437" height="344" fill="#000000"/>
+
+  <!-- Feature curve -->
+  <polyline
+    points="97,247 101,246 106,247 111,247 116,246 121,247 126,247 131,247
+      136,247 141,247 146,247 151,247 156,247 161,246 166,247 171,247
+      176,247 181,247 186,248 191,247 196,248 201,247 206,248 211,247
+      216,248 221,248 226,248 231,248 236,248 241,248 246,248 251,248
+      256,248 261,248 266,248 271,248 276,248 281,248 286,248 291,248
+      296,247 301,248 306,248 311,248 316,248 321,247 326,248 331,247
+      336,248 340,247 343,244 345,234 347,224 349,216 351,209 353,199
+      355,190 358,177 360,164 363,154 365,150 367,153 369,146 371,149
+      373,143 375,146 377,139 379,141 381,136 383,134 385,132 387,127
+      389,130 391,119 393,115 395,107 397,108 399,100 401,96 403,91
+      405,94 407,86 409,88 411,78 413,76 415,67 417,70 419,57 421,62
+      423,42 424,31"
+    fill="none" stroke="#0000ff" stroke-width="1.4" stroke-linejoin="round"
+    stroke-linecap="round"/>
+
+  <!-- STSA threshold: 1140 -->
+  <line x1="341" y1="13" x2="341" y2="260"
+    stroke="#00a51a" stroke-width="2" stroke-dasharray="9 4"/>
+
+  <!-- mu+3sigma threshold: 1192 -->
+  <line x1="352" y1="13" x2="352" y2="260"
+    stroke="#ff9900" stroke-width="2" stroke-dasharray="9 4"/>
+
+  <!-- Legend -->
+  <rect x="88" y="20" width="112" height="77" rx="4" ry="4"
+    fill="#ffffff" stroke="#bfbfbf" stroke-width="1.5"/>
+  <line x1="95" y1="34" x2="130" y2="34"
+    stroke="#0000ff" stroke-width="1.4"/>
+  <text x="143" y="40" fill="#000000" font-family="'Times New Roman', serif"
+    font-size="16">Feature</text>
+
+  <line x1="95" y1="57" x2="130" y2="57"
+    stroke="#ff9900" stroke-width="2" stroke-dasharray="9 4"/>
+  <text x="143" y="63" fill="#000000" font-family="'Times New Roman', serif"
+    font-size="16">&#956;+3&#963;</text>
+
+  <line x1="95" y1="80" x2="130" y2="80"
+    stroke="#00a51a" stroke-width="2" stroke-dasharray="9 4"/>
+  <text x="143" y="86" fill="#000000" font-family="'Times New Roman', serif"
+    font-size="16">STSA</text>
+</svg>
