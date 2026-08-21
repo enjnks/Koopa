@@ -104,6 +104,12 @@ the original plot:
 Only RGB channels are normalized; alpha values and pixel coordinates are not
 changed, so line positions, widths, antialiasing, and dash patterns stay fixed.
 
+## PHM2012 TSP sensitivity experiment
+
+The experiment requirements transcribed from the reference image, including
+formulas, result tables, and two Markdown/Mermaid chart examples, are available
+in [`docs/phm2012_tsp_sensitivity_experiment.md`](docs/phm2012_tsp_sensitivity_experiment.md).
+
 
 ## Citation
 
