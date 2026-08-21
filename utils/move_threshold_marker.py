@@ -59,12 +59,16 @@ def unpremultiply_region(
         for x in range(max(0, left), min(image.width, right)):
             red, green, blue, alpha = pixels[x, y]
             if 0 < alpha < 255:
-                pixels[x, y] = (
+                corrected = (
                     min(255, round(red * 255 / alpha)),
                     min(255, round(green * 255 / alpha)),
                     min(255, round(blue * 255 / alpha)),
-                    alpha,
                 )
+                # Remove tiny channel-rounding differences from the white fill
+                # without touching dark text, borders, or colored line samples.
+                if min(corrected) >= 245 and max(corrected) - min(corrected) <= 10:
+                    corrected = (255, 255, 255)
+                pixels[x, y] = (*corrected, alpha)
 
 
 def move_marker(
