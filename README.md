@@ -69,6 +69,78 @@ bash ./scripts/ETT_script/Koopa.sh
 <img src="./figures/algorithm.png" height = "480" alt="" align=center />
 </p>
 
+## Threshold visualization
+
+`figures/stsa_threshold_1192.png` is the corrected transparent image.
+`figures/stsa_threshold_1192.svg` is a self-contained SVG version that embeds
+the corrected pixels without changing the chart dimensions.
+
+- STSA: 1140 (green dashed line)
+- μ+3σ: 1192 (orange dashed line)
+
+The source chart is 1359 × 1000 pixels. Its zero point is at x=290 and the
+STSA marker center is at x=1021. Using the same linear scale gives the new
+μ+3σ center:
+
+```text
+290 + (1021 - 290) × 1192 / 1140 ≈ 1054
+```
+
+Only the old marker strip and the new marker strip are edited. Transparency,
+axes, labels, legend, and all other source pixels are retained. The reusable
+utility is `utils/move_threshold_marker.py`.
+
+The legend region is converted from incorrectly premultiplied RGBA values to
+standard straight-alpha PNG values. This keeps its background white when the
+image is inserted into Word instead of appearing gray.
+
+To avoid muted colors in Word, chart lines use the same standard RGB values as
+the original plot:
+
+- Feature blue: `RGB(0, 0, 255)` / `#0000FF`
+- μ+3σ orange: `RGB(255, 165, 0)` / `#FFA500`
+- STSA green: `RGB(0, 128, 0)` / `#008000`
+
+Only RGB channels are normalized; alpha values and pixel coordinates are not
+changed, so line positions, widths, antialiasing, and dash patterns stay fixed.
+
+## PHM2012 TSP sensitivity experiment
+
+The experiment requirements transcribed from the reference image, including
+formulas, result tables, and two Markdown/Mermaid chart examples, are available
+in [`docs/phm2012_tsp_sensitivity_experiment.md`](docs/phm2012_tsp_sensitivity_experiment.md).
+
+## Chart without the μ+3σ marker
+
+`figures/image3_without_mu3sigma.png` removes the orange/yellow μ+3σ vertical
+marker and its legend row while retaining the Feature curve, STSA marker,
+axes, labels, original dimensions, and transparency. A self-contained SVG is
+available at `figures/image3_without_mu3sigma.svg`.
+
+The reusable pixel-preserving utility is `utils/remove_mu3sigma.py`. It also
+compacts the legend to two rows and restores the axis pixels previously covered
+by the removed marker. Because the μ+3σ marker overlapped the Feature signal,
+the hidden blue segment is reconnected from the neighboring trajectory so the
+result remains continuous after marker removal. Two isolated blue remnants
+inside the former marker strip are removed without altering the connected main
+trajectory.
+
+## Matched waveform figure style
+
+`figures/wechat_waveform_matched_style.png` reformats the 0–12000 minute
+waveform to match the two reference figures:
+
+- 410 × 296 pixel canvas;
+- Tinos, a metric-compatible Times New Roman substitute;
+- 16 pt axis labels and 14 pt tick labels;
+- waveform color `#1F77B4`;
+- white background and 1 px black axes.
+
+The original waveform pixels are extracted from the source plot and recolored,
+while axes and text are rendered again at the target resolution. The SVG output
+is `figures/wechat_waveform_matched_style.svg`, and the reusable renderer is
+`utils/restyle_waveform.py`.
+
 
 ## Citation
 
