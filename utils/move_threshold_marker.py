@@ -11,7 +11,7 @@ import argparse
 import base64
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 def is_orange(pixel: tuple[int, int, int, int]) -> bool:
@@ -50,6 +50,7 @@ def move_marker(
     *,
     old_center_x: int,
     new_center_x: int,
+    restore_blue_path: list[tuple[int, int]] | None = None,
 ) -> tuple[tuple[int, int, int, int], tuple[int, int, int, int]]:
     """Move the orange vertical marker and return old/new changed bounds."""
     source = Image.open(source_path).convert("RGBA")
@@ -71,9 +72,11 @@ def move_marker(
     # Include antialiased/shadow pixels surrounding the orange core, but never
     # absorb the blue feature curve into the movable marker.
     marker_mask: set[tuple[int, int]] = set()
+    restore_mask: set[tuple[int, int]] = set()
     for core_x, core_y in core:
         for y in range(max(0, core_y - 2), min(source.height, core_y + 3)):
             for x in range(max(0, core_x - 4), min(source.width, core_x + 5)):
+                restore_mask.add((x, y))
                 pixel = pixels[x, y]
                 if pixel[3] > 0 and not is_blue(pixel):
                     marker_mask.add((x, y))
@@ -82,19 +85,50 @@ def move_marker(
     max_x = max(x for x, _ in marker_mask)
     min_y = min(y for _, y in marker_mask)
     max_y = max(y for _, y in marker_mask)
-    left_x = max(0, min_x - 3)
-    right_x = min(source.width - 1, max_x + 3)
+    # WPS adds a faint antialiasing shadow beyond the colored marker core.
+    # Clear the complete narrow strip so no orange/gray residue remains.
+    restore_min_x = max(0, old_center_x - 9)
+    restore_max_x = min(source.width - 1, old_center_x + 9)
+    restore_mask = {
+        (x, y)
+        for y in range(min_y, max_y + 1)
+        for x in range(restore_min_x, restore_max_x + 1)
+    }
+    left_x = max(0, restore_min_x - 3)
+    right_x = min(source.width - 1, restore_max_x + 3)
 
-    # Restore what the old line covered from the nearest unaffected pixels.
-    # This is exact for transparent background and horizontal axes; around the
-    # blue curve it creates a short, continuous interpolation across the strip.
-    for x, y in marker_mask:
-        ratio = (x - left_x) / (right_x - left_x)
-        output[x, y] = interpolate_rgba(
-            pixels[left_x, y],
-            pixels[right_x, y],
-            ratio,
+    # Remove the complete old marker footprint. Transparent plot pixels become
+    # transparent again, while the horizontal plot borders are sampled from
+    # their unchanged neighboring pixels.
+    for x, y in restore_mask:
+        if y <= min_y + 5 or y >= max_y - 5:
+            ratio = (x - left_x) / (right_x - left_x)
+            output[x, y] = interpolate_rgba(
+                pixels[left_x, y],
+                pixels[right_x, y],
+                ratio,
+            )
+        else:
+            output[x, y] = (0, 0, 0, 0)
+
+    # The old marker hid a short part of the feature curve. If supplied,
+    # reconnect that path with an antialiased stroke sampled from the source.
+    if restore_blue_path:
+        scale = 4
+        blue_overlay = Image.new(
+            "RGBA",
+            (source.width * scale, source.height * scale),
+            (0, 0, 0, 0),
         )
+        draw = ImageDraw.Draw(blue_overlay)
+        draw.line(
+            [(x * scale, y * scale) for x, y in restore_blue_path],
+            fill=(10, 10, 188, 255),
+            width=3 * scale,
+            joint="curve",
+        )
+        blue_overlay = blue_overlay.resize(source.size, Image.Resampling.LANCZOS)
+        result = Image.alpha_composite(result, blue_overlay)
 
     # Alpha-composite the original marker pixels at their calibrated location.
     delta_x = new_center_x - old_center_x
@@ -122,7 +156,7 @@ def move_marker(
         encoding="utf-8",
     )
 
-    old_bounds = (min_x, min_y, max_x, max_y)
+    old_bounds = (restore_min_x, min_y, restore_max_x, max_y)
     new_bounds = (
         min_x + delta_x,
         min_y,
@@ -139,17 +173,29 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("svg_output", type=Path)
     parser.add_argument("--old-x", type=int, required=True)
     parser.add_argument("--new-x", type=int, required=True)
+    parser.add_argument(
+        "--restore-blue-path",
+        help='Semicolon-separated points, for example "1261,190;1266,187;1266,110"',
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
+    restore_blue_path = None
+    if args.restore_blue_path:
+        restore_blue_path = [
+            tuple(map(int, point.split(",",)))
+            for point in args.restore_blue_path.split(";")
+        ]
+
     old_bounds, new_bounds = move_marker(
         args.source,
         args.png_output,
         args.svg_output,
         old_center_x=args.old_x,
         new_center_x=args.new_x,
+        restore_blue_path=restore_blue_path,
     )
     print(f"old marker bounds: {old_bounds}")
     print(f"new marker bounds: {new_bounds}")
