@@ -71,15 +71,24 @@ bash ./scripts/ETT_script/Koopa.sh
 
 ## Threshold visualization
 
-`figures/stsa_threshold_1192.png` is the corrected image. Its editable vector
-source is available at `figures/stsa_threshold_1192.svg`.
+`figures/stsa_threshold_1192.png` is the corrected transparent image.
+`figures/stsa_threshold_1192.svg` is a self-contained SVG version that embeds
+the corrected pixels without changing the chart dimensions.
 
 - STSA: 1140 (green dashed line)
 - μ+3σ: 1192 (orange dashed line)
 
-The μ+3σ position is calculated with the same linear horizontal scale as the
-STSA marker. For future updates, generating the plot directly from the original
-data is preferable to editing image pixels, because it avoids rounding errors.
+The source chart is 1359 × 1000 pixels. Its zero point is at x=290 and the
+STSA marker center is at x=1021. Using the same linear scale gives the new
+μ+3σ center:
+
+```text
+290 + (1021 - 290) × 1192 / 1140 ≈ 1054
+```
+
+Only the old marker strip and the new marker strip are edited. Transparency,
+axes, labels, legend, and all other source pixels are retained. The reusable
+utility is `utils/move_threshold_marker.py`.
 
 
 ## Citation
