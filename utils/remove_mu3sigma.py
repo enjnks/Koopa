@@ -111,6 +111,25 @@ def restore_feature_path(
     image.alpha_composite(clipped)
 
 
+def remove_isolated_blue_artifacts(
+    image: Image.Image,
+    boxes: list[tuple[int, int, int, int]],
+) -> None:
+    """Remove blue remnants that protrude separately from the main trajectory."""
+    pixels = image.load()
+    for left, top, right, bottom in boxes:
+        for y in range(max(0, top), min(image.height, bottom)):
+            for x in range(max(0, left), min(image.width, right)):
+                red, green, blue, alpha = pixels[x, y]
+                if (
+                    alpha > 0
+                    and blue > 10
+                    and blue > red * 1.15
+                    and blue > green * 1.15
+                ):
+                    pixels[x, y] = (0, 0, 0, 0)
+
+
 def compact_legend(
     image: Image.Image,
     *,
@@ -176,6 +195,13 @@ def main() -> None:
         image,
         [(376, 106), (377, 96), (378, 86), (379, 76), (380, 66)],
         clip_x=(marker_bounds[0], marker_bounds[2]),
+    )
+    remove_isolated_blue_artifacts(
+        image,
+        [
+            (374, 44, 380, 52),
+            (374, 57, 380, 65),
+        ],
     )
     legend_bounds = compact_legend(
         image,
