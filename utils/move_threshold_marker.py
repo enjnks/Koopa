@@ -43,6 +43,30 @@ def interpolate_rgba(
     )
 
 
+def unpremultiply_region(
+    image: Image.Image,
+    bounds: tuple[int, int, int, int],
+) -> None:
+    """Correct premultiplied colors stored in a straight-alpha PNG region.
+
+    Some WPS exports store a semitransparent white legend as (203, 203, 203,
+    203), which Word composites as gray. Straight-alpha PNG requires the RGB
+    channels to remain (255, 255, 255) at that alpha.
+    """
+    pixels = image.load()
+    left, top, right, bottom = bounds
+    for y in range(max(0, top), min(image.height, bottom)):
+        for x in range(max(0, left), min(image.width, right)):
+            red, green, blue, alpha = pixels[x, y]
+            if 0 < alpha < 255:
+                pixels[x, y] = (
+                    min(255, round(red * 255 / alpha)),
+                    min(255, round(green * 255 / alpha)),
+                    min(255, round(blue * 255 / alpha)),
+                    alpha,
+                )
+
+
 def move_marker(
     source_path: Path,
     png_path: Path,
@@ -51,6 +75,7 @@ def move_marker(
     old_center_x: int,
     new_center_x: int,
     restore_blue_path: list[tuple[int, int]] | None = None,
+    normalize_legend_bounds: tuple[int, int, int, int] | None = None,
 ) -> tuple[tuple[int, int, int, int], tuple[int, int, int, int]]:
     """Move the orange vertical marker and return old/new changed bounds."""
     source = Image.open(source_path).convert("RGBA")
@@ -140,6 +165,9 @@ def move_marker(
             overlay_pixels[target_x, y] = pixels[x, y]
     result = Image.alpha_composite(result, overlay)
 
+    if normalize_legend_bounds:
+        unpremultiply_region(result, normalize_legend_bounds)
+
     png_path.parent.mkdir(parents=True, exist_ok=True)
     result.save(png_path, format="PNG", optimize=False)
 
@@ -177,6 +205,10 @@ def parse_args() -> argparse.Namespace:
         "--restore-blue-path",
         help='Semicolon-separated points, for example "1261,190;1266,187;1266,110"',
     )
+    parser.add_argument(
+        "--normalize-legend",
+        help='Legend bounds as "left,top,right,bottom"',
+    )
     return parser.parse_args()
 
 
@@ -188,6 +220,9 @@ def main() -> None:
             tuple(map(int, point.split(",",)))
             for point in args.restore_blue_path.split(";")
         ]
+    normalize_legend_bounds = None
+    if args.normalize_legend:
+        normalize_legend_bounds = tuple(map(int, args.normalize_legend.split(",")))
 
     old_bounds, new_bounds = move_marker(
         args.source,
@@ -196,6 +231,7 @@ def main() -> None:
         old_center_x=args.old_x,
         new_center_x=args.new_x,
         restore_blue_path=restore_blue_path,
+        normalize_legend_bounds=normalize_legend_bounds,
     )
     print(f"old marker bounds: {old_bounds}")
     print(f"new marker bounds: {new_bounds}")

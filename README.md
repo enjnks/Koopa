@@ -90,6 +90,10 @@ Only the old marker strip and the new marker strip are edited. Transparency,
 axes, labels, legend, and all other source pixels are retained. The reusable
 utility is `utils/move_threshold_marker.py`.
 
+The legend region is converted from incorrectly premultiplied RGBA values to
+standard straight-alpha PNG values. This keeps its background white when the
+image is inserted into Word instead of appearing gray.
+
 
 ## Citation
 
