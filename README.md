@@ -110,6 +110,17 @@ The experiment requirements transcribed from the reference image, including
 formulas, result tables, and two Markdown/Mermaid chart examples, are available
 in [`docs/phm2012_tsp_sensitivity_experiment.md`](docs/phm2012_tsp_sensitivity_experiment.md).
 
+## Chart without the μ+3σ marker
+
+`figures/image3_without_mu3sigma.png` removes the orange/yellow μ+3σ vertical
+marker and its legend row while retaining the Feature curve, STSA marker,
+axes, labels, original dimensions, and transparency. A self-contained SVG is
+available at `figures/image3_without_mu3sigma.svg`.
+
+The reusable pixel-preserving utility is `utils/remove_mu3sigma.py`. It also
+compacts the legend to two rows and restores the axis pixels previously covered
+by the removed marker.
+
 
 ## Citation
 
